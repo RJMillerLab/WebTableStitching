@@ -60,19 +60,23 @@ public class DiscoverFunctionalDependencies extends Executable {
 		
 		File csvFile = new File(csvLocation);
 		csvFile.mkdirs();
-		
-		System.err.println("Running Functional Dependecy Discovery");
+	
+        // added by FN
+        File jsonFile = new File(jsonLocation);
+        jsonFile.mkdirs();
+		//
+        System.err.println("Running Functional Dependecy Discovery");
 		FunctionalDependencyDiscovery discovery = new FunctionalDependencyDiscovery();
-		discovery.run(web.getTables().values(), csvFile);
+		discovery.run(web.getTables().values(), csvFile, jsonFile);
 		
-		File jsonFile = new File(jsonLocation);
-		jsonFile.mkdirs();
+		//File jsonFile = new File(jsonLocation);
+		//jsonFile.mkdirs();
 		
-		System.err.println("Writing Tables");
-		JsonTableWriter jtw = new JsonTableWriter();
-		for(Table t : web.getTables().values()) {
-			jtw.write(t, new File(jsonFile, t.getPath()));
-		}		
+		//System.err.println("Writing Tables");
+		//JsonTableWriter jtw = new JsonTableWriter();
+		//for(Table t : web.getTables().values()) {
+		//	jtw.write(t, new File(jsonFile, t.getPath()));
+		//}		
 		
 		System.err.println("Done.");
 	}

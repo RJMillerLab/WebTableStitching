@@ -22,6 +22,10 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
+import java.util.HashMap;
+import java.util.Iterator;
+import java.io.*;
+
 import com.beust.jcommander.Parameter;
 
 import de.uni_mannheim.informatik.dws.tnt.match.DisjointHeaders;
@@ -86,23 +90,40 @@ public class CreateStitchedUnionTables extends Executable {
 	
 	public void run() throws Exception {
 		System.err.println("Loading Web Tables");
-		WebTables web = WebTables.loadWebTables(new File(webLocation), true, true, false, serialise);
-		web.removeHorizontallyStackedTables();
-		
+		// code added by FN
+        String[] corpusFile = sourceLocation.list();
+
+
+        WebTables web = WebTables.loadWebTables(new File(webLocation), true, true, false, serialise);
+		//web.removeHorizontallyStackedTables();
+	
+        // print table map to a file
+        writeMap(web.getTableIndices()); 
+        //
 		System.err.println("Matching Union Tables");
 		Processable<Correspondence<MatchableTableColumn, Matchable>> schemaCorrespondences = runTableMatching(web);
+	    // writing schema correspondences to a csv file 
+        BufferedWriter w = new BufferedWriter(new FileWriter("/home/fnargesian/TABLE_UNION_OUTPUT/benchmark-v5/stitching_results.csv"));
+         System.err.println("Writing Correspondences");
+         Collection<Correspondence<MatchableTableColumn, Matchable>> alignments = schemaCorrespondences.get();
+         w.write("query_table_id, query_table_name, query_column_id, query_column_name, candidate_table_id, candidate_table_name, candidate_column_id, candidate_column_name, score");
+         for(Correspondence<MatchableTableColumn, Matchable> corr : alignments) {
+            String c1 = Integer.toString(corr.getFirstRecord().getTableId()) + ", , " + Integer.toString(corr.getFirstRecord().getColumnIndex()) + ", \"" + corr.getFirstRecord().getHeader() + "\", ";
+            String c2 = Integer.toString(corr.getSecondRecord().getTableId()) + ", , " + Integer.toString(corr.getSecondRecord().getColumnIndex()) + ", \"" + corr.getSecondRecord().getHeader() + "\", " + String.valueOf(corr.getSimilarityScore()) + "\n"; 
+            w.write(c1 + c2);
+         }
+         w.close();
+		//System.err.println("Creating Stitched Union Tables");
+		//StitchedUnionTables stitchedUnion = new StitchedUnionTables();
+		//Collection<Table> reconstructed = stitchedUnion.create(web.getTables(), web.getRecords(), web.getSchema(), web.getCandidateKeys(), schemaCorrespondences);
 		
-		System.err.println("Creating Stitched Union Tables");
-		StitchedUnionTables stitchedUnion = new StitchedUnionTables();
-		Collection<Table> reconstructed = stitchedUnion.create(web.getTables(), web.getRecords(), web.getSchema(), web.getCandidateKeys(), schemaCorrespondences);
-		
-		File outFile = new File(resultLocation);
-		outFile.mkdirs();
-		System.err.println("Writing Stitched Union Tables");
-		JsonTableWriter w = new JsonTableWriter();
-		for(Table t : reconstructed) {
-			w.write(t, new File(outFile, t.getPath()));
-		}
+		//File outFile = new File(resultLocation);
+		//outFile.mkdirs();
+		//System.err.println("Writing Stitched Union Tables");
+		//JsonTableWriter w = new JsonTableWriter();
+		//for(Table t : reconstructed) {
+		//	w.write(t, new File(outFile, t.getPath()));
+		//}
 		
 		System.err.println("Done.");
 	}
@@ -153,4 +174,24 @@ public class CreateStitchedUnionTables extends Executable {
     	
     	return schemaCorrespondences;
 	}
+
+    //hack: write the web table map to a file
+    //    
+    public void writeMap (HashMap<String, Integer> tables) {
+        System.out.println("writing table map");
+        try {
+            FileWriter fstream;
+            BufferedWriter out;
+            fstream = new FileWriter("tables.map");
+            out = new BufferedWriter(fstream);
+            int count = 0;
+            Iterator<Map.Entry<String, Integer>> it = tables.entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry<String, Integer> pairs = it.next();
+                out.write(pairs.getKey() + " : " + pairs.getValue() + "\n");
+                count++;
+            }
+            out.close();
+        }catch(Exception e){}
+    }
 }

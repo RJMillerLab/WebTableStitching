@@ -30,6 +30,7 @@ import de.uni_mannheim.informatik.dws.winter.processing.ProcessableCollection;
 import de.uni_mannheim.informatik.dws.winter.webtables.Table;
 import de.uni_mannheim.informatik.dws.winter.webtables.TableColumn;
 import de.uni_mannheim.informatik.dws.winter.webtables.writers.CSVTableWriter;
+import de.uni_mannheim.informatik.dws.winter.webtables.writers.JsonTableWriter;
 
 /**
  * 
@@ -40,7 +41,7 @@ import de.uni_mannheim.informatik.dws.winter.webtables.writers.CSVTableWriter;
  */
 public class FunctionalDependencyDiscovery {
 
-	public void run(Collection<Table> tables, File csvOutput) throws FileNotFoundException {
+	public void run(Collection<Table> tables, File csvOutput, File jsonOutput) throws FileNotFoundException {
 		
 		// redirect std. out (from HyFD)
 		PrintStream tmp = new PrintStream(new File("HyFD_UCC.out"));
@@ -86,6 +87,11 @@ public class FunctionalDependencyDiscovery {
 		    		// list all candidate keys
 		    		Collection<Set<TableColumn>> candKeysWithContext = FunctionalDependencyUtils.calculateUniqueColumnCombinations(t, f); 
 		    		t.getSchema().setCandidateKeys(candKeysWithContext);
+
+                    // added by FN - writing the table to a file 
+                    System.err.println("Writing Table " +  t.getPath());
+                    JsonTableWriter jtw = new JsonTableWriter();
+                    jtw.write(t, new File(jsonOutput, t.getPath()));
 				} catch(Exception e) {
 					e.printStackTrace();
 				}

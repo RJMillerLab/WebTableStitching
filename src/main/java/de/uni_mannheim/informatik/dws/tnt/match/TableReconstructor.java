@@ -25,6 +25,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Iterator;
+import java.io.*;
 
 import de.uni_mannheim.informatik.dws.tnt.match.data.MatchableTableColumn;
 import de.uni_mannheim.informatik.dws.tnt.match.data.MatchableTableDeterminant;
@@ -326,13 +328,26 @@ public class TableReconstructor {
 			Processable<MatchableTableDeterminant> candidateKeys,
 			Processable<Correspondence<MatchableTableColumn, Matchable>> schemaCorrespondences) {
 		
-		Map<Collection<Integer>, Integer> tableClusters = getTableClusters(attributes, schemaCorrespondences);
+		Map<Collection<Integer>, Integer> tableClusters =getTableClusters(attributes, schemaCorrespondences);
 		
 		Collection<Table> result = new ArrayList<>(tableClusters.size());
-		
+	
+        // FN - preparing the output file
+        try {
+        File f = new File("clusters.txt");
+        if(f.exists() && !f.isDirectory()) { 
+            f.delete();
+        }
+        FileWriter fstream;                                        
+        BufferedWriter out;                                        
+        fstream = new FileWriter("clusters.txt", true);                  
+        out = new BufferedWriter(fstream); 
+        // 
 		int tableId = firstTableId;
 		for(Collection<Integer> tableCluster : tableClusters.keySet()) {
-		
+            // print the unionable tables
+            writeCluster(tableCluster, out);
+            //
 			Processable<Correspondence<MatchableTableColumn, Matchable>> clusterCorrespondences = getCorrespondencesForTableCluster(tableCluster, schemaCorrespondences);
 			Processable<MatchableTableColumn> clusterAttributes = getAttributesForTableCluster(tableCluster, attributes);
 			
@@ -347,7 +362,8 @@ public class TableReconstructor {
 		
 			result.add(t);
 		}
-		
+        out.close();
+    }catch(Exception e){}		
 		return result;
 	}
 	
@@ -379,4 +395,18 @@ public class TableReconstructor {
 		
 		return t.project(newColumns);
 	}
+
+    public void writeCluster (Collection<Integer> cluster, BufferedWriter out) {
+        try {
+            System.out.println("cluster size");
+            System.out.println(cluster.size());
+            out.write("@@@@@\n");
+            int count = 0;
+            Iterator<Integer> iterator = cluster.iterator();
+            while (iterator.hasNext()) {
+                out.write(iterator.next() + "\n");
+                count++;
+            }
+        }catch(Exception e){}
+    }
 }
