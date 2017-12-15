@@ -4,6 +4,8 @@ JAR="../target/webtablestitching-1.0-jar-with-dependencies.jar"
 CLS="de.uni_mannheim.informatik.dws.tnt.match.cli.CreateStitchedUnionTables"
 
 TABLES="../examples/union_dep/"
+#TABLES="../datasets/benchmark/"
 RESULTS="../examples/stitched_union/"
+#RESULTS="../datasets/stitched_benchmark/"
 
-java -cp $JAR $CLS -web $TABLES -results $RESULTS -matcher Label
+java -cp $JAR $CLS -web $TABLES -results $RESULTS -matcher NonTrivialFull 

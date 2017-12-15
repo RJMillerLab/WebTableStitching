@@ -3,8 +3,13 @@
 JAR="../target/webtablestitching-1.0-jar-with-dependencies.jar"
 CLS="de.uni_mannheim.informatik.dws.tnt.match.cli.DiscoverFunctionalDependencies"
 
-TABLES="../examples/union/"
-CSV="../examples/union_csv/"
-RESULTS="../examples/union_dep/"
+#TABLES="../examples/union/"
+TABLES="/home/fnargesian/TABLE_UNION_OUTPUT/benchmark-v5/jsonfiles/"
+#CSV="../examples/union_csv/"
+CSV="/home/fnargesian/TABLE_UNION_OUTPUT/benchmark-v5/benchmark_csv/"
+#RESULTS="../examples/union_dep/"
+RESULTS="/home/fnargesian/TABLE_UNION_OUTPUT/benchmark-v5/benchmark_dep/" 
+
+export _JAVA_OPTIONS="-Xms4112m -Xmx8224m"
 
 java -cp $JAR $CLS -web $TABLES -csv $CSV -json $RESULTS
