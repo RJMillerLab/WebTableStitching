@@ -91,7 +91,7 @@ public class CreateStitchedUnionTables extends Executable {
 	public void run() throws Exception {
 		System.err.println("Loading Web Tables");
 		// code added by FN
-        String[] corpusFile = sourceLocation.list();
+        //String[] corpusFile = sourceLocation.list();
 
 
         WebTables web = WebTables.loadWebTables(new File(webLocation), true, true, false, serialise);
